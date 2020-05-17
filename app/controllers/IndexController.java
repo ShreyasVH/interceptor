@@ -68,6 +68,7 @@ public class IndexController extends BaseController
 			String url = "http://" + host + ":" + port + "/" + path;
 
 			Map<String, String[]> queryStringParams = request.queryString();
+			String queryString = "";
 			if(!queryStringParams.keySet().isEmpty())
 			{
 				String[] params = new String[queryStringParams.keySet().size()];
@@ -81,8 +82,10 @@ public class IndexController extends BaseController
 					}
 				}
 
-				url += "?" + String.join("&", params);
+				queryString = "?" + String.join("&", params);
 			}
+			url += queryString;
+			final String queryStringFinal = queryString;
 
 			return apiClient.get(url, headers).thenApplyAsync(response -> {
 				Date endTime = Utils.getCurrentDate();
@@ -93,7 +96,7 @@ public class IndexController extends BaseController
 				apiResponse.setHeaders(Json.toJson(response.getHeaders()));
 				apiResponse.setDuration(endTime.getTime() - startTime.getTime());
 
-				CompletableFuture.supplyAsync(() -> this.logRepository.saveRequest(host, port, path, "GET", request, headers, apiResponse));
+				CompletableFuture.supplyAsync(() -> this.logRepository.saveRequest(host, port, path + queryStringFinal, "GET", request, headers, apiResponse));
 
 				return status(response.getStatus(), response.asJson());
 			}).exceptionally(exception -> {
@@ -102,7 +105,7 @@ public class IndexController extends BaseController
 				apiResponse.setStatus(0);
 				apiResponse.setHeaders(Json.toJson(new HashMap<>()));
 				apiResponse.setDuration(0);
-				CompletableFuture.supplyAsync(() -> this.logRepository.saveRequest(host, port, path, "GET", request, headers, apiResponse));
+				CompletableFuture.supplyAsync(() -> this.logRepository.saveRequest(host, port, path + queryStringFinal, "GET", request, headers, apiResponse));
 
 				return ok("Error");
 			});
@@ -141,6 +144,7 @@ public class IndexController extends BaseController
 			String url = "http://" + host + ":" + port + "/" + path;
 
 			Map<String, String[]> queryStringParams = request.queryString();
+			String queryString = "";
 			if(!queryStringParams.keySet().isEmpty())
 			{
 				String[] params = new String[queryStringParams.keySet().size()];
@@ -154,8 +158,10 @@ public class IndexController extends BaseController
 					}
 				}
 
-				url += "?" + String.join("&", params);
+				queryString = "?" + String.join("&", params);
 			}
+			url += queryString;
+			final String queryStringFinal = queryString;
 
 			return apiClient.post(url, request.body().asJson(), headers).thenApplyAsync(response -> {
 				Date endTime = Utils.getCurrentDate();
@@ -166,7 +172,7 @@ public class IndexController extends BaseController
 				apiResponse.setHeaders(Json.toJson(response.getHeaders()));
 				apiResponse.setDuration(endTime.getTime() - startTime.getTime());
 
-				CompletableFuture.supplyAsync(() -> this.logRepository.saveRequest(host, port, path, "POST", request, headers, apiResponse));
+				CompletableFuture.supplyAsync(() -> this.logRepository.saveRequest(host, port, path + queryStringFinal, "POST", request, headers, apiResponse));
 
 				return status(response.getStatus(), response.asJson());
 			}).exceptionally(exception -> {
@@ -175,7 +181,7 @@ public class IndexController extends BaseController
 				apiResponse.setStatus(0);
 				apiResponse.setHeaders(Json.toJson(new HashMap<>()));
 				apiResponse.setDuration(0);
-				CompletableFuture.supplyAsync(() -> this.logRepository.saveRequest(host, port, path, "POST", request, headers, apiResponse));
+				CompletableFuture.supplyAsync(() -> this.logRepository.saveRequest(host, port, path + queryStringFinal, "POST", request, headers, apiResponse));
 
 				return ok("Error");
 			});
@@ -216,6 +222,7 @@ public class IndexController extends BaseController
 			String url = "http://" + host + ":" + port + "/" + path;
 
 			Map<String, String[]> queryStringParams = request.queryString();
+			String queryString = "";
 			if(!queryStringParams.keySet().isEmpty())
 			{
 				String[] params = new String[queryStringParams.keySet().size()];
@@ -229,8 +236,10 @@ public class IndexController extends BaseController
 					}
 				}
 
-				url += "?" + String.join("&", params);
+				queryString = "?" + String.join("&", params);
 			}
+			url += queryString;
+			final String queryStringFinal = queryString;
 
 			return apiClient.put(url, payload, headers).thenApplyAsync(response -> {
 				Date endTime = Utils.getCurrentDate();
@@ -241,7 +250,7 @@ public class IndexController extends BaseController
 				apiResponse.setHeaders(Json.toJson(response.getHeaders()));
 				apiResponse.setDuration(endTime.getTime() - startTime.getTime());
 
-				CompletableFuture.supplyAsync(() -> this.logRepository.saveRequest(host, port, path, "PUT", request, headers, apiResponse));
+				CompletableFuture.supplyAsync(() -> this.logRepository.saveRequest(host, port, path + queryStringFinal, "PUT", request, headers, apiResponse));
 
 				return status(response.getStatus(), response.asJson());
 			}).exceptionally(exception -> {
@@ -250,7 +259,7 @@ public class IndexController extends BaseController
 				apiResponse.setStatus(0);
 				apiResponse.setHeaders(Json.toJson(new HashMap<>()));
 				apiResponse.setDuration(0);
-				CompletableFuture.supplyAsync(() -> this.logRepository.saveRequest(host, port, path, "PUT", request, headers, apiResponse));
+				CompletableFuture.supplyAsync(() -> this.logRepository.saveRequest(host, port, path + queryStringFinal, "PUT", request, headers, apiResponse));
 
 				return ok("Error");
 			});
@@ -289,6 +298,7 @@ public class IndexController extends BaseController
 			String url = "http://" + host + ":" + port + "/" + path;
 
 			Map<String, String[]> queryStringParams = request.queryString();
+			String queryString = "";
 			if(!queryStringParams.keySet().isEmpty())
 			{
 				String[] params = new String[queryStringParams.keySet().size()];
@@ -302,8 +312,10 @@ public class IndexController extends BaseController
 					}
 				}
 
-				url += "?" + String.join("&", params);
+				queryString = "?" + String.join("&", params);
 			}
+			url += queryString;
+			final String queryStringFinal = queryString;
 
 			return apiClient.delete(url, headers).thenApplyAsync(response -> {
 				Date endTime = Utils.getCurrentDate();
@@ -314,7 +326,7 @@ public class IndexController extends BaseController
 				apiResponse.setHeaders(Json.toJson(response.getHeaders()));
 				apiResponse.setDuration(endTime.getTime() - startTime.getTime());
 
-				CompletableFuture.supplyAsync(() -> this.logRepository.saveRequest(host, port, path, "DELETE", request, headers, apiResponse));
+				CompletableFuture.supplyAsync(() -> this.logRepository.saveRequest(host, port, path + queryStringFinal, "DELETE", request, headers, apiResponse));
 
 				return status(response.getStatus(), response.asJson());
 			}).exceptionally(exception -> {
@@ -323,7 +335,7 @@ public class IndexController extends BaseController
 				apiResponse.setStatus(0);
 				apiResponse.setHeaders(Json.toJson(new HashMap<>()));
 				apiResponse.setDuration(0);
-				CompletableFuture.supplyAsync(() -> this.logRepository.saveRequest(host, port, path, "DELETE", request, headers, apiResponse));
+				CompletableFuture.supplyAsync(() -> this.logRepository.saveRequest(host, port, path + queryStringFinal, "DELETE", request, headers, apiResponse));
 
 				return ok("Error");
 			});
