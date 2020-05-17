@@ -15,7 +15,6 @@ import java.util.concurrent.CompletionStage;
 import java.util.concurrent.CompletableFuture;
 import play.db.ebean.EbeanDynamicEvolutions;
 import play.libs.Json;
-import play.libs.ws.WSResponse;
 import play.mvc.Http;
 
 public class LogRepository
@@ -37,7 +36,7 @@ public class LogRepository
         this.databaseExecutionContext = databaseExecutionContext;
     }
 
-    public CompletionStage<Request> saveRequest(String host, String port, String path, String method, Http.Request request, Map requestHeaders, WSResponse response, Long duration)
+    public CompletionStage<Request> saveRequest(String host, String port, String path, String method, Http.Request request, Map requestHeaders, Response response)
     {
         return CompletableFuture.supplyAsync(() -> {
             Request apiRequest = new Request();
@@ -50,13 +49,7 @@ public class LogRepository
 
             try
             {
-                Response apiResponse = new Response();
-                apiResponse.setBody(response.getBody());
-                apiResponse.setStatus(response.getStatus());
-                apiResponse.setHeaders(Json.toJson(response.getHeaders()));
-                apiResponse.setDuration(duration);
-
-                apiRequest.setResponse(apiResponse);
+                apiRequest.setResponse(response);
 
                 this.db.save(apiRequest);
                 return apiRequest;
@@ -67,5 +60,18 @@ public class LogRepository
                 throw new DBInteractionException(400, message);
             }
         }, this.databaseExecutionContext);
+    }
+
+    public void clear()
+    {
+        try
+        {
+            this.db.deleteAll(this.db.find(Request.class).findList());
+        }
+        catch(Exception ex)
+        {
+            String message = "DB Interaction Failed. Exception: " + ex;
+            throw new DBInteractionException(400, message);
+        }
     }
 }

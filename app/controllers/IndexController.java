@@ -2,6 +2,7 @@ package controllers;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.inject.Inject;
+import models.Response;
 import play.libs.ws.WSRequest;
 import play.libs.ws.WSResponse;
 import play.mvc.Result;
@@ -85,11 +86,23 @@ public class IndexController extends BaseController
 
 			return apiClient.get(url, headers).thenApplyAsync(response -> {
 				Date endTime = Utils.getCurrentDate();
-				CompletableFuture.supplyAsync(() -> this.logRepository.saveRequest(host, port, path, "GET", request, headers, response, (endTime.getTime() - startTime.getTime())));
+
+				Response apiResponse = new Response();
+				apiResponse.setBody(response.getBody());
+				apiResponse.setStatus(response.getStatus());
+				apiResponse.setHeaders(Json.toJson(response.getHeaders()));
+				apiResponse.setDuration(endTime.getTime() - startTime.getTime());
+
+				CompletableFuture.supplyAsync(() -> this.logRepository.saveRequest(host, port, path, "GET", request, headers, apiResponse));
 
 				return status(response.getStatus(), response.asJson());
 			}).exceptionally(exception -> {
-//				CompletableFuture.supplyAsync(() -> this.logRepository.saveRequest(host, port, path, "GET", request, headers, response, 0));
+				Response apiResponse = new Response();
+				apiResponse.setBody(exception.getMessage());
+				apiResponse.setStatus(0);
+				apiResponse.setHeaders(Json.toJson(new HashMap<>()));
+				apiResponse.setDuration(0);
+				CompletableFuture.supplyAsync(() -> this.logRepository.saveRequest(host, port, path, "GET", request, headers, apiResponse));
 
 				return ok("Error");
 			});
@@ -146,9 +159,25 @@ public class IndexController extends BaseController
 
 			return apiClient.post(url, request.body().asJson(), headers).thenApplyAsync(response -> {
 				Date endTime = Utils.getCurrentDate();
-				CompletableFuture.supplyAsync(() -> this.logRepository.saveRequest(host, port, path, "POST", request, headers, response, (endTime.getTime() - startTime.getTime())));
+
+				Response apiResponse = new Response();
+				apiResponse.setBody(response.getBody());
+				apiResponse.setStatus(response.getStatus());
+				apiResponse.setHeaders(Json.toJson(response.getHeaders()));
+				apiResponse.setDuration(endTime.getTime() - startTime.getTime());
+
+				CompletableFuture.supplyAsync(() -> this.logRepository.saveRequest(host, port, path, "POST", request, headers, apiResponse));
 
 				return status(response.getStatus(), response.asJson());
+			}).exceptionally(exception -> {
+				Response apiResponse = new Response();
+				apiResponse.setBody(exception.getMessage());
+				apiResponse.setStatus(0);
+				apiResponse.setHeaders(Json.toJson(new HashMap<>()));
+				apiResponse.setDuration(0);
+				CompletableFuture.supplyAsync(() -> this.logRepository.saveRequest(host, port, path, "POST", request, headers, apiResponse));
+
+				return ok("Error");
 			});
 		}
 
@@ -205,9 +234,25 @@ public class IndexController extends BaseController
 
 			return apiClient.put(url, payload, headers).thenApplyAsync(response -> {
 				Date endTime = Utils.getCurrentDate();
-				CompletableFuture.supplyAsync(() -> this.logRepository.saveRequest(host, port, path, "PUT", request, headers, response, (endTime.getTime() - startTime.getTime())));
+
+				Response apiResponse = new Response();
+				apiResponse.setBody(response.getBody());
+				apiResponse.setStatus(response.getStatus());
+				apiResponse.setHeaders(Json.toJson(response.getHeaders()));
+				apiResponse.setDuration(endTime.getTime() - startTime.getTime());
+
+				CompletableFuture.supplyAsync(() -> this.logRepository.saveRequest(host, port, path, "PUT", request, headers, apiResponse));
 
 				return status(response.getStatus(), response.asJson());
+			}).exceptionally(exception -> {
+				Response apiResponse = new Response();
+				apiResponse.setBody(exception.getMessage());
+				apiResponse.setStatus(0);
+				apiResponse.setHeaders(Json.toJson(new HashMap<>()));
+				apiResponse.setDuration(0);
+				CompletableFuture.supplyAsync(() -> this.logRepository.saveRequest(host, port, path, "PUT", request, headers, apiResponse));
+
+				return ok("Error");
 			});
 		}
 
@@ -262,9 +307,25 @@ public class IndexController extends BaseController
 
 			return apiClient.delete(url, headers).thenApplyAsync(response -> {
 				Date endTime = Utils.getCurrentDate();
-				CompletableFuture.supplyAsync(() -> this.logRepository.saveRequest(host, port, path, "DELETE", request, headers, response, (endTime.getTime() - startTime.getTime())));
+
+				Response apiResponse = new Response();
+				apiResponse.setBody(response.getBody());
+				apiResponse.setStatus(response.getStatus());
+				apiResponse.setHeaders(Json.toJson(response.getHeaders()));
+				apiResponse.setDuration(endTime.getTime() - startTime.getTime());
+
+				CompletableFuture.supplyAsync(() -> this.logRepository.saveRequest(host, port, path, "DELETE", request, headers, apiResponse));
 
 				return status(response.getStatus(), response.asJson());
+			}).exceptionally(exception -> {
+				Response apiResponse = new Response();
+				apiResponse.setBody(exception.getMessage());
+				apiResponse.setStatus(0);
+				apiResponse.setHeaders(Json.toJson(new HashMap<>()));
+				apiResponse.setDuration(0);
+				CompletableFuture.supplyAsync(() -> this.logRepository.saveRequest(host, port, path, "DELETE", request, headers, apiResponse));
+
+				return ok("Error");
 			});
 		}
 
@@ -287,4 +348,13 @@ public class IndexController extends BaseController
             return status(response.getStatus(), response.asJson());
         });
     }
+
+    public CompletionStage<Result> clear()
+	{
+		return CompletableFuture.supplyAsync(() -> {
+			this.logRepository.clear();
+
+			return ok("success");
+		});
+	}
 }
