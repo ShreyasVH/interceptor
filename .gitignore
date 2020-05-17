@@ -1,0 +1,7 @@
+.idea/
+logs/
+target/
+project/target/
+project/project/
+.env
+conf/evolutions/

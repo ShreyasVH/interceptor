@@ -1,0 +1,8 @@
+GET 	/ 				controllers.IndexController.index()
+
+POST	/test			controllers.IndexController.test(request : Request)
+
+GET		/*path			controllers.IndexController.get(path, request : Request)
+POST	/*path			controllers.IndexController.post(path, request : Request)
+PUT		/*path			controllers.IndexController.put(path, request : Request)
+DELETE	/*path			controllers.IndexController.delete(path, request : Request)
