@@ -1,7 +1,5 @@
-#!/usr/bin/env bash
-
- set -o allexport
- source .env;
- set +o allexport
-
-activator -jvm-debug "8070" -Dhttps.port="10070" "run 9070";
+# $env:PATH;
+# echo $PATH;
+# source .env;
+# $env:MYSQL_PORT;
+./sbt -jvm-debug "7070" "run 9070";
