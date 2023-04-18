@@ -9,6 +9,7 @@ import play.mvc.Http;
 import repositories.LogRepository;
 import utils.ApiClient;
 import utils.Utils;
+import play.libs.ws.WSResponse;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -17,11 +18,15 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.function.Supplier;
 
+import static akka.http.javadsl.model.ContentTypes.APPLICATION_JSON;
+
 public class IndexController extends BaseController
 {
 	private final ApiClient apiClient;
 
 	private final LogRepository logRepository;
+
+	private final List<String> allowedHeaders;
 
 	@Inject
 	public IndexController
@@ -34,6 +39,39 @@ public class IndexController extends BaseController
 		this.apiClient = apiClient;
 
 		this.logRepository = logRepository;
+
+		allowedHeaders = new ArrayList<String>(){
+			{
+				add("authorization");
+				add("x-us-access-token");
+				add("x-us-client-id");
+				add("x-client-id");
+				add("x-iam-client-id");
+				add("x-iam-access-token");
+				add("ins-client-id");
+				add("x-diagnostics-client-id");
+				add("x-diagnostics-access-token");
+				add("X-ds-client-id");
+				add("X-ds-access-token");
+			}
+		};
+	}
+
+	private Result handleResponse(WSResponse response) {
+
+		if(response.getContentType().contains("application/json"))
+		{
+			return status(response.getStatus(), response.getBody()).as(response.getHeaderValues(CONTENT_TYPE).get(0));
+		}
+		else if(response.getContentType().contains("text/html"))
+		{
+			return status(response.getStatus(), response.getBody()).as(response.getHeaderValues(CONTENT_TYPE).get(0));
+		}
+		else
+		{
+			return status(response.getStatus(), response.getBody());
+		}
+
 	}
 
 	public Result index()
@@ -52,13 +90,8 @@ public class IndexController extends BaseController
 			for(String key: keys)
 			{
 				List<String> values = requestHeaders.get(key);
-				List<String> allowedHeaders = new ArrayList<String>(){
-					{
-						add("Authorization");
-					}
-				};
 
-				if((key.toLowerCase().contains("quikr")) || allowedHeaders.contains(key))
+				if((key.toLowerCase().contains("quikr")) || allowedHeaders.contains(key.toLowerCase()))
 				{
 					headers.put(key, values);
 				}
@@ -83,7 +116,7 @@ public class IndexController extends BaseController
 						return IndexController.this.logRepository.saveRequest(host, port, decodedURI, "GET", request, headers, apiResponse);
 					}
 				});
-				return status(response.getStatus(), response.getBody());
+				return handleResponse(response);
 			}).exceptionally(exception -> {
 				Response apiResponse = new Response();
 				apiResponse.setBody(exception.getMessage());
@@ -112,13 +145,7 @@ public class IndexController extends BaseController
             for(String key: keys)
             {
                 List<String> values = requestHeaders.get(key);
-                List<String> allowedHeaders = new ArrayList<String>(){
-                    {
-                        add("Authorization");
-                    }
-                };
-
-                if((key.toLowerCase().contains("quikr")) || allowedHeaders.contains(key))
+                if((key.toLowerCase().contains("quikr")) || allowedHeaders.contains(key.toLowerCase()))
                 {
                     headers.put(key, values);
                 }
@@ -139,7 +166,7 @@ public class IndexController extends BaseController
 
 				CompletableFuture.supplyAsync(() -> this.logRepository.saveRequest(host, port, decodedURI, "POST", request, headers, apiResponse));
 
-				return status(response.getStatus(), response.getBody());
+				return handleResponse(response);
 			}).exceptionally(exception -> {
 				Response apiResponse = new Response();
 				apiResponse.setBody(exception.getMessage());
@@ -168,13 +195,8 @@ public class IndexController extends BaseController
 			for(String key: keys)
 			{
 				List<String> values = requestHeaders.get(key);
-				List<String> allowedHeaders = new ArrayList<String>(){
-					{
-						add("Authorization");
-					}
-				};
 
-				if((key.toLowerCase().contains("quikr")) || allowedHeaders.contains(key))
+				if((key.toLowerCase().contains("quikr")) || allowedHeaders.contains(key.toLowerCase()))
 				{
 					headers.put(key, values);
 				}
@@ -197,7 +219,7 @@ public class IndexController extends BaseController
 
 				CompletableFuture.supplyAsync(() -> this.logRepository.saveRequest(host, port, decodedURI, "PUT", request, headers, apiResponse));
 
-				return status(response.getStatus(), response.getBody());
+				return handleResponse(response);
 			}).exceptionally(exception -> {
 				Response apiResponse = new Response();
 				apiResponse.setBody(exception.getMessage());
@@ -226,13 +248,8 @@ public class IndexController extends BaseController
 			for(String key: keys)
 			{
 				List<String> values = requestHeaders.get(key);
-				List<String> allowedHeaders = new ArrayList<String>(){
-					{
-						add("Authorization");
-					}
-				};
 
-				if((key.toLowerCase().contains("quikr")) || allowedHeaders.contains(key))
+				if((key.toLowerCase().contains("quikr")) || allowedHeaders.contains(key.toLowerCase()))
 				{
 					headers.put(key, values);
 				}
@@ -253,7 +270,7 @@ public class IndexController extends BaseController
 
 				CompletableFuture.supplyAsync(() -> this.logRepository.saveRequest(host, port, decodedURI, "DELETE", request, headers, apiResponse));
 
-				return status(response.getStatus(), response.getBody());
+				return handleResponse(response);
 			}).exceptionally(exception -> {
 				Response apiResponse = new Response();
 				apiResponse.setBody(exception.getMessage());
