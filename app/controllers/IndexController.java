@@ -91,7 +91,7 @@ public class IndexController extends BaseController
 			{
 				List<String> values = requestHeaders.get(key);
 
-				if((key.toLowerCase().contains("quikr")) || allowedHeaders.contains(key.toLowerCase()))
+				if(true || (key.toLowerCase().contains("quikr")) || allowedHeaders.contains(key.toLowerCase()))
 				{
 					headers.put(key, values);
 				}
