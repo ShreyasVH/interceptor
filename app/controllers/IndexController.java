@@ -1,5 +1,6 @@
 package controllers;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.google.inject.Inject;
 import models.Request;
 import models.Response;
@@ -27,6 +28,7 @@ public class IndexController extends BaseController
 	private final LogRepository logRepository;
 
 	private final List<String> allowedHeaders;
+	private final List<String> excludedHeaders;
 
 	@Inject
 	public IndexController
@@ -55,23 +57,71 @@ public class IndexController extends BaseController
 				add("X-ds-access-token");
 			}
 		};
+
+		excludedHeaders = Arrays.asList(
+			"x-forwarded-proto",
+			"x-forwarded-port",
+			"Host",
+			"x-forwarded-for",
+			"request-id",
+			"Tls-Session-Info",
+			"Remote-Address",
+			"x-ms-request-root-id",
+			"Content-Length",
+			"Timeout-Access",
+			"x-ms-request-id",
+			"Raw-Request-URI",
+			"Content-Type"
+		);
+	}
+
+	private String[] formatHeadersForResponse(Map<String, List<String>> headers)
+	{
+		String[] formattedHeaders = new String[headers.size() * 2];
+
+		int index = 0;
+		for (Map.Entry<String, List<String>> entry: headers.entrySet()) {
+			formattedHeaders[index++] = entry.getKey();
+			formattedHeaders[index++] = entry.getValue().get(0);
+		}
+
+		return formattedHeaders;
+	}
+
+	private Map<String, List<String>> formatHeadersForRequest(Map<String, List<String>> requestHeaders) {
+		Map<String, List<String>> headers = new HashMap<>();
+		Set<String> keys = requestHeaders.keySet();
+		for(String key: keys)
+		{
+			List<String> values = requestHeaders.get(key);
+
+			if(!excludedHeaders.contains(key))
+			{
+				headers.put(key, values);
+			}
+		}
+		return headers;
 	}
 
 	private Result handleResponse(WSResponse response) {
 
 		if(response.getContentType().contains("application/json"))
 		{
-			return status(response.getStatus(), response.getBody()).as(response.getHeaderValues(CONTENT_TYPE).get(0));
+			return status(response.getStatus(), response.getBody()).as(response.getHeaderValues(CONTENT_TYPE).get(0)).withHeaders(formatHeadersForResponse(response.getHeaders()));
 		}
 		else if(response.getContentType().contains("text/html"))
 		{
-			return status(response.getStatus(), response.getBody()).as(response.getHeaderValues(CONTENT_TYPE).get(0));
+			return status(response.getStatus(), response.getBody()).as(response.getHeaderValues(CONTENT_TYPE).get(0)).withHeaders(formatHeadersForResponse(response.getHeaders()));
 		}
 		else
 		{
 			return status(response.getStatus(), response.getBody());
 		}
 
+	}
+
+	public String getHost(Http.Request request) {
+		return ((request.header("x-forwarded-myhost").isPresent()) ? request.header("x-forwarded-myhost").get() : "localhost");
 	}
 
 	public Result index()
@@ -84,20 +134,9 @@ public class IndexController extends BaseController
 		{
 			Date startTime = Utils.getCurrentDate();
 			String port = request.header("x-forwarded-port").get();
-			Map<String, List<String>> requestHeaders = request.getHeaders().toMap();
-			Map<String, List<String>> headers = new HashMap<>();
-			Set<String> keys = requestHeaders.keySet();
-			for(String key: keys)
-			{
-				List<String> values = requestHeaders.get(key);
+			Map<String, List<String>> headers = formatHeadersForRequest(request.getHeaders().asMap());
 
-				if(true || (key.toLowerCase().contains("quikr")) || allowedHeaders.contains(key.toLowerCase()))
-				{
-					headers.put(key, values);
-				}
-			}
-
-			String host = "localhost";
+			String host = getHost(request);
 			String decodedURI = URLDecoder.decode(request.uri(), "UTF-8");
 			final String url = "http://" + host + ":" + port + decodedURI;
 
@@ -139,19 +178,10 @@ public class IndexController extends BaseController
 		{
 			Date startTime = Utils.getCurrentDate();
 			String port = request.header("x-forwarded-port").get();
-			Map<String, List<String>> requestHeaders = request.getHeaders().toMap();
-            Map<String, List<String>> headers = new HashMap<>();
-            Set<String> keys = requestHeaders.keySet();
-            for(String key: keys)
-            {
-                List<String> values = requestHeaders.get(key);
-                if((key.toLowerCase().contains("quikr")) || allowedHeaders.contains(key.toLowerCase()))
-                {
-                    headers.put(key, values);
-                }
-            }
 
-			String host = "localhost";
+			Map<String, List<String>> headers = formatHeadersForRequest(request.getHeaders().asMap());
+
+			String host = getHost(request);
 			String decodedURI = URLDecoder.decode(request.uri(), "UTF-8");
 			final String url = "http://" + host + ":" + port + decodedURI;
 
@@ -189,22 +219,12 @@ public class IndexController extends BaseController
 		{
 			Date startTime = Utils.getCurrentDate();
 			String port = request.header("x-forwarded-port").get();
-			Map<String, List<String>> requestHeaders = request.getHeaders().toMap();
-			Map<String, List<String>> headers = new HashMap<>();
-			Set<String> keys = requestHeaders.keySet();
-			for(String key: keys)
-			{
-				List<String> values = requestHeaders.get(key);
 
-				if((key.toLowerCase().contains("quikr")) || allowedHeaders.contains(key.toLowerCase()))
-				{
-					headers.put(key, values);
-				}
-			}
+			Map<String, List<String>> headers = formatHeadersForRequest(request.getHeaders().asMap());
 
 			Map payload = Utils.convertObject(request.body().asJson(), HashMap.class);
 
-			String host = "localhost";
+			String host = getHost(request);
 			String decodedURI = URLDecoder.decode(request.uri(), "UTF-8");
 			final String url = "http://" + host + ":" + port + decodedURI;
 
@@ -242,20 +262,10 @@ public class IndexController extends BaseController
 		{
 			Date startTime = Utils.getCurrentDate();
 			String port = request.header("x-forwarded-port").get();
-			Map<String, List<String>> requestHeaders = request.getHeaders().toMap();
-			Map<String, List<String>> headers = new HashMap<>();
-			Set<String> keys = requestHeaders.keySet();
-			for(String key: keys)
-			{
-				List<String> values = requestHeaders.get(key);
 
-				if((key.toLowerCase().contains("quikr")) || allowedHeaders.contains(key.toLowerCase()))
-				{
-					headers.put(key, values);
-				}
-			}
+			Map<String, List<String>> headers = formatHeadersForRequest(request.getHeaders().asMap());
 
-			String host = "localhost";
+			String host = getHost(request);
 			String decodedURI = URLDecoder.decode(request.uri(), "UTF-8");
 			final String url = "http://" + host + ":" + port + decodedURI;
 
