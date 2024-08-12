@@ -265,11 +265,13 @@ public class IndexController extends BaseController
 
 			Map<String, List<String>> headers = formatHeadersForRequest(request.getHeaders().asMap());
 
+			Map payload = Utils.convertObject(request.body().asJson(), HashMap.class);
+
 			String host = getHost(request);
 			String decodedURI = URLDecoder.decode(request.uri(), "UTF-8");
 			final String url = "http://" + host + ":" + port + decodedURI;
 
-			return apiClient.delete(url, headers).thenApplyAsync(response -> {
+			return apiClient.delete(url, payload, headers).thenApplyAsync(response -> {
 				Date endTime = Utils.getCurrentDate();
 
 				Response apiResponse = new Response();

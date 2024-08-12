@@ -68,7 +68,7 @@ public class ApiClient implements WSBodyReadables, WSBodyWritables
 		return request.put(Json.toJson(payload));
 	}
 
-	public CompletionStage<WSResponse> delete(String url, Map<String, List<String>> additionalHeaders)
+	public CompletionStage<WSResponse> delete(String url, Map payload, Map<String, List<String>> additionalHeaders)
 	{
 		WSRequest request = this.client.url(url);
 
@@ -81,6 +81,6 @@ public class ApiClient implements WSBodyReadables, WSBodyWritables
 			}
 		}
 
-		return request.delete();
+		return request.setBody(Json.toJson(payload)).delete();
 	}
 }
