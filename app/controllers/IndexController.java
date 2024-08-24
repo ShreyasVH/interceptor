@@ -300,6 +300,47 @@ public class IndexController extends BaseController
 		});
 	}
 
+	public CompletionStage<Result> options(String path, Http.Request request) throws UnsupportedEncodingException {
+		if(request.header("x-forwarded-port").isPresent())
+		{
+			Date startTime = Utils.getCurrentDate();
+			String port = request.header("x-forwarded-port").get();
+
+			Map<String, List<String>> headers = formatHeadersForRequest(request.getHeaders().asMap());
+
+			String host = getHost(request);
+			String decodedURI = URLDecoder.decode(request.uri(), "UTF-8");
+			final String url = "http://" + host + ":" + port + decodedURI;
+
+			return apiClient.options(url, request.body().asJson(), headers).thenApplyAsync(response -> {
+				Date endTime = Utils.getCurrentDate();
+
+				Response apiResponse = new Response();
+				apiResponse.setBody(response.getBody());
+				apiResponse.setStatus(response.getStatus());
+				apiResponse.setHeaders(Json.toJson(response.getHeaders()));
+				apiResponse.setDuration(endTime.getTime() - startTime.getTime());
+
+				CompletableFuture.supplyAsync(() -> this.logRepository.saveRequest(host, port, decodedURI, "OPTIONS", request, headers, apiResponse));
+
+				return handleResponse(response);
+			}).exceptionally(exception -> {
+				Response apiResponse = new Response();
+				apiResponse.setBody(exception.getMessage());
+				apiResponse.setStatus(0);
+				apiResponse.setHeaders(Json.toJson(new HashMap<>()));
+				apiResponse.setDuration(0);
+				CompletableFuture.supplyAsync(() -> this.logRepository.saveRequest(host, port, decodedURI, "POST", request, headers, apiResponse));
+
+				return ok("Error");
+			});
+		}
+
+		return CompletableFuture.supplyAsync(() -> {
+			return ok("Error");
+		});
+	}
+
     public CompletionStage<Result> clear()
 	{
 		return CompletableFuture.supplyAsync(() -> {

@@ -83,4 +83,20 @@ public class ApiClient implements WSBodyReadables, WSBodyWritables
 
 		return request.setBody(Json.toJson(payload)).delete();
 	}
+
+	public CompletionStage<WSResponse> options(String url, JsonNode payload, Map<String, List<String>> additionalHeaders)
+	{
+		WSRequest request = this.client.url(url);
+
+		for(String key: additionalHeaders.keySet())
+		{
+			if(null != additionalHeaders.get(key))
+			{
+				List<String> values = additionalHeaders.get(key);
+				request.addHeader(key, String.join(";", values));
+			}
+		}
+
+		return request.options();
+	}
 }
