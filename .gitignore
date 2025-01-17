@@ -6,3 +6,6 @@ project/project/
 .env
 .envrc
 .DS_Store
+.bsp
+*.iml
+dist/
