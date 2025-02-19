@@ -9,3 +9,4 @@ project/project/
 .bsp
 *.iml
 dist/
+interceptor.log

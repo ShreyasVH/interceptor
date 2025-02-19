@@ -1,8 +1,9 @@
 VERSION=$(grep 'version := ' build.sbt | awk -F'"' '{print $2}')
+NAME=$(grep 'name := ' build.sbt | awk -F'"' '{print $2}')
 
-rm -rf interceptor-$VERSION
+rm -rf dist
 sbt clean compile dist
-unzip target/universal/interceptor-$VERSION.zip
-mv interceptor-$VERSION dist
+unzip target/universal/$NAME-$VERSION.zip
+mv $NAME-$VERSION dist
 
 # sbt clean compile stage
