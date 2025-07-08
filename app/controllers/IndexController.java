@@ -129,6 +129,10 @@ public class IndexController extends BaseController
 		return ok("INDEX");
 	}
 
+	public CompletionStage<Result> root(Http.Request request) throws UnsupportedEncodingException {
+		return get("/", request);
+	}
+
 	public CompletionStage<Result> get(String path, Http.Request request) throws UnsupportedEncodingException {
 		if(request.header("x-forwarded-port").isPresent())
 		{
