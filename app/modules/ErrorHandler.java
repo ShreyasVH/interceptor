@@ -15,6 +15,13 @@ import javax.inject.Singleton;
 @Singleton
 public class ErrorHandler implements HttpErrorHandler {
     public CompletionStage<Result> onClientError(RequestHeader request, int statusCode, String message) {
+        System.out.println("Client error");
+        System.out.println(message);
+        System.out.println(statusCode);
+        System.out.println(request.method());
+        System.out.println(request.host());
+        System.out.println(request.path());
+        System.out.println(request.queryString());
         return CompletableFuture.completedFuture(Results.status(statusCode, "A client error occurred: " + message));
     }
 
@@ -43,6 +50,15 @@ public class ErrorHandler implements HttpErrorHandler {
         Map<String, Object> response = new HashMap<>();
         response.put("code", errorCode);
         response.put("description", content);
+
+        System.out.println("Client error");
+        System.out.println(exception.getMessage());
+        System.out.println(errorCode);
+        System.out.println(content);
+        System.out.println(request.method());
+        System.out.println(request.host());
+        System.out.println(request.path());
+        System.out.println(request.queryString());
 
         return CompletableFuture.completedFuture(Results.status(httpsStatusCode, Json.toJson(response)));
     }
