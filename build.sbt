@@ -7,7 +7,7 @@ scalaVersion := "2.13.10"
 libraryDependencies ++= Seq(
 	guice,
 	javaWs,
-	"mysql" % "mysql-connector-java" % "8.0.31",
+	"mysql" % "mysql-connector-java" % "9.5.0",
 	"org.projectlombok" % "lombok" % "1.18.24" % "provided"
 )
 
