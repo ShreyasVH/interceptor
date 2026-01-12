@@ -1,11 +1,8 @@
 package repositories;
 
 import exceptions.DBInteractionException;
-import io.ebean.Ebean;
-import io.ebean.EbeanServer;
 import models.Request;
 import models.Response;
-import play.db.ebean.EbeanConfig;
 
 import com.google.inject.Inject;
 import modules.DatabaseExecutionContext;
@@ -13,26 +10,19 @@ import modules.DatabaseExecutionContext;
 import java.util.Map;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.CompletableFuture;
-import play.db.ebean.EbeanDynamicEvolutions;
+
+import play.db.jpa.JPAApi;
 import play.libs.Json;
 import play.mvc.Http;
 
 public class LogRepository
 {
-    private final EbeanServer db;
-    private final EbeanDynamicEvolutions ebeanDynamicEvolutions;
+    private final JPAApi jpaApi;
     private final DatabaseExecutionContext databaseExecutionContext;
 
     @Inject
-    public LogRepository
-    (
-            EbeanConfig ebeanConfig,
-            EbeanDynamicEvolutions ebeanDynamicEvolutions,
-            DatabaseExecutionContext databaseExecutionContext
-    )
-    {
-        this.ebeanDynamicEvolutions = ebeanDynamicEvolutions;
-        this.db = Ebean.getServer(ebeanConfig.defaultServer());
+    public LogRepository(JPAApi jpaApi, DatabaseExecutionContext databaseExecutionContext) {
+        this.jpaApi = jpaApi;
         this.databaseExecutionContext = databaseExecutionContext;
     }
 
@@ -44,15 +34,17 @@ public class LogRepository
             apiRequest.setPort(port);
             apiRequest.setPath(path);
             apiRequest.setMethod(method);
-            apiRequest.setPayload(request.body().asJson());
-            apiRequest.setHeaders(Json.toJson(requestHeaders));
+            apiRequest.setPayload(request.hasBody() ? request.body().asJson().toString(): "");
+            apiRequest.setHeaders(Json.toJson(requestHeaders).toString());
 
             try
             {
                 apiRequest.setResponse(response);
 
-                this.db.save(apiRequest);
-                return apiRequest;
+                return jpaApi.withTransaction(em -> {
+                    em.persist(apiRequest);
+                    return apiRequest;
+                });
             }
             catch(Exception ex)
             {
@@ -66,7 +58,10 @@ public class LogRepository
     {
         try
         {
-            this.db.deleteAll(this.db.find(Request.class).findList());
+            jpaApi.withTransaction(em -> {
+                em.createQuery("DELETE FROM Request").executeUpdate();
+                em.createQuery("DELETE FROM Response").executeUpdate();
+            });
         }
         catch(Exception ex)
         {
