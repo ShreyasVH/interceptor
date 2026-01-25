@@ -1,6 +1,5 @@
 package controllers;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.google.inject.Inject;
 import models.Request;
 import models.Response;
@@ -19,7 +18,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.function.Supplier;
 
-import static akka.http.javadsl.model.ContentTypes.APPLICATION_JSON;
 
 public class IndexController extends BaseController
 {
@@ -150,7 +148,7 @@ public class IndexController extends BaseController
 				Response apiResponse = new Response();
 				apiResponse.setBody(response.getBody());
 				apiResponse.setStatus(response.getStatus());
-				apiResponse.setHeaders(Json.toJson(response.getHeaders()));
+				apiResponse.setHeaders(Json.toJson(response.getHeaders()).toString());
 				apiResponse.setDuration(endTime.getTime() - startTime.getTime());
 
 				CompletableFuture.supplyAsync(new Supplier<CompletionStage<Request>>() {
@@ -164,7 +162,7 @@ public class IndexController extends BaseController
 				Response apiResponse = new Response();
 				apiResponse.setBody(exception.getMessage());
 				apiResponse.setStatus(0);
-				apiResponse.setHeaders(Json.toJson(new HashMap<>()));
+				apiResponse.setHeaders(Json.toJson(new HashMap<>()).toString());
 				apiResponse.setDuration(0);
 				CompletableFuture.supplyAsync(() -> this.logRepository.saveRequest(host, port, decodedURI, "GET", request, headers, apiResponse));
 
@@ -195,7 +193,7 @@ public class IndexController extends BaseController
 				Response apiResponse = new Response();
 				apiResponse.setBody(response.getBody());
 				apiResponse.setStatus(response.getStatus());
-				apiResponse.setHeaders(Json.toJson(response.getHeaders()));
+				apiResponse.setHeaders(Json.toJson(response.getHeaders()).toString());
 				apiResponse.setDuration(endTime.getTime() - startTime.getTime());
 
 				CompletableFuture.supplyAsync(() -> this.logRepository.saveRequest(host, port, decodedURI, "POST", request, headers, apiResponse));
@@ -205,7 +203,7 @@ public class IndexController extends BaseController
 				Response apiResponse = new Response();
 				apiResponse.setBody(exception.getMessage());
 				apiResponse.setStatus(0);
-				apiResponse.setHeaders(Json.toJson(new HashMap<>()));
+				apiResponse.setHeaders(Json.toJson(new HashMap<>()).toString());
 				apiResponse.setDuration(0);
 				CompletableFuture.supplyAsync(() -> this.logRepository.saveRequest(host, port, decodedURI, "POST", request, headers, apiResponse));
 
@@ -238,7 +236,7 @@ public class IndexController extends BaseController
 				Response apiResponse = new Response();
 				apiResponse.setBody(response.getBody());
 				apiResponse.setStatus(response.getStatus());
-				apiResponse.setHeaders(Json.toJson(response.getHeaders()));
+				apiResponse.setHeaders(Json.toJson(response.getHeaders()).toString());
 				apiResponse.setDuration(endTime.getTime() - startTime.getTime());
 
 				CompletableFuture.supplyAsync(() -> this.logRepository.saveRequest(host, port, decodedURI, "PUT", request, headers, apiResponse));
@@ -248,7 +246,7 @@ public class IndexController extends BaseController
 				Response apiResponse = new Response();
 				apiResponse.setBody(exception.getMessage());
 				apiResponse.setStatus(0);
-				apiResponse.setHeaders(Json.toJson(new HashMap<>()));
+				apiResponse.setHeaders(Json.toJson(new HashMap<>()).toString());
 				apiResponse.setDuration(0);
 				CompletableFuture.supplyAsync(() -> this.logRepository.saveRequest(host, port, decodedURI, "PUT", request, headers, apiResponse));
 
@@ -281,7 +279,7 @@ public class IndexController extends BaseController
 				Response apiResponse = new Response();
 				apiResponse.setBody(response.getBody());
 				apiResponse.setStatus(response.getStatus());
-				apiResponse.setHeaders(Json.toJson(response.getHeaders()));
+				apiResponse.setHeaders(Json.toJson(response.getHeaders()).toString());
 				apiResponse.setDuration(endTime.getTime() - startTime.getTime());
 
 				CompletableFuture.supplyAsync(() -> this.logRepository.saveRequest(host, port, decodedURI, "DELETE", request, headers, apiResponse));
@@ -291,7 +289,7 @@ public class IndexController extends BaseController
 				Response apiResponse = new Response();
 				apiResponse.setBody(exception.getMessage());
 				apiResponse.setStatus(0);
-				apiResponse.setHeaders(Json.toJson(new HashMap<>()));
+				apiResponse.setHeaders(Json.toJson(new HashMap<>()).toString());
 				apiResponse.setDuration(0);
 				CompletableFuture.supplyAsync(() -> this.logRepository.saveRequest(host, port, decodedURI, "DELETE", request, headers, apiResponse));
 
@@ -322,7 +320,7 @@ public class IndexController extends BaseController
 				Response apiResponse = new Response();
 				apiResponse.setBody(response.getBody());
 				apiResponse.setStatus(response.getStatus());
-				apiResponse.setHeaders(Json.toJson(response.getHeaders()));
+				apiResponse.setHeaders(Json.toJson(response.getHeaders()).toString());
 				apiResponse.setDuration(endTime.getTime() - startTime.getTime());
 
 				CompletableFuture.supplyAsync(() -> this.logRepository.saveRequest(host, port, decodedURI, "OPTIONS", request, headers, apiResponse));
@@ -332,7 +330,7 @@ public class IndexController extends BaseController
 				Response apiResponse = new Response();
 				apiResponse.setBody(exception.getMessage());
 				apiResponse.setStatus(0);
-				apiResponse.setHeaders(Json.toJson(new HashMap<>()));
+				apiResponse.setHeaders(Json.toJson(new HashMap<>()).toString());
 				apiResponse.setDuration(0);
 				CompletableFuture.supplyAsync(() -> this.logRepository.saveRequest(host, port, decodedURI, "POST", request, headers, apiResponse));
 

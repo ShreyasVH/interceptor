@@ -1,7 +1,7 @@
 package modules;
 
 import play.libs.concurrent.CustomExecutionContext;
-import akka.actor.ActorSystem;
+import org.apache.pekko.actor.ActorSystem;
 import com.google.inject.Inject;
 
 public class DatabaseExecutionContext extends CustomExecutionContext
