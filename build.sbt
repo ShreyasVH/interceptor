@@ -10,7 +10,7 @@ libraryDependencies += jdbc
 libraryDependencies += javaJpa
 libraryDependencies += javaWs
 libraryDependencies += "com.mysql" % "mysql-connector-j" % "9.6.0"
-libraryDependencies += "org.projectlombok" % "lombok" % "1.18.42" % "provided"
+libraryDependencies += "org.projectlombok" % "lombok" % "1.18.44" % "provided"
 libraryDependencies += "org.hibernate.orm" % "hibernate-core" % "7.2.7.Final"
 
 Compile / javacOptions ++= Seq("-proc:full")
