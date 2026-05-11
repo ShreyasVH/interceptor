@@ -4,10 +4,11 @@ export PATH=
 # java 11 path
 export PATH=
 
+export APPLICATION_SECRET=
+
 export MYSQL_IP=
 export MYSQL_PORT=
 export MYSQL_DB_NAME=
 export MYSQL_USER=
 export MYSQL_PASSWORD=
-
-export APPLICATION_SECRET=
+export MYSQL_VERSION=
