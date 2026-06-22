@@ -2,7 +2,7 @@
 export PATH=
 export JAVA_HOME=
 
-# sbt 2.0.0 path
+# sbt 1.12.11 path
 export PATH=
 
 export APPLICATION_SECRET=
