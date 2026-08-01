@@ -9,7 +9,7 @@ libraryDependencies += evolutions
 libraryDependencies += jdbc
 libraryDependencies += javaJpa
 libraryDependencies += javaWs
-libraryDependencies += "com.mysql" % "mysql-connector-j" % "9.7.0"
+libraryDependencies += "com.mysql" % "mysql-connector-j" % "26.7.0"
 libraryDependencies += "org.projectlombok" % "lombok" % "1.18.46" % "provided"
 libraryDependencies += "org.hibernate.orm" % "hibernate-core" % "7.4.5.Final"
 
